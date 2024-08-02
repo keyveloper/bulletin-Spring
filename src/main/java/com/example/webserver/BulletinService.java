@@ -21,10 +21,10 @@ public class BulletinService {
 
     public Optional<Long> putBoard(String title, String writer, String textContent) {
         BoardEntity board = BoardEntity.builder()
-                .boardTitle(title).boardWriter(writer)
-                .boardTextContent(textContent)
-                .boardWritingDate(LocalDateTime.now())
-                .boardReadingCount(0)
+                .title(title).writer(writer)
+                .textContent(textContent)
+                .writingDate(LocalDateTime.now())
+                .readingCount(0)
                 .build();
         boardRepository.save(board);
         return Optional.of(board.getBoardId());
@@ -48,7 +48,7 @@ public class BulletinService {
         Optional<BoardEntity> boardOpt = boardRepository.findById(id);
         if (boardOpt.isPresent()) {
             BoardEntity board = boardOpt.get();
-            board.setBoardTextContent(content);
+            board.setTextContent(content);
             boardRepository.save(board);
             return Optional.of("new content updated successfully " + id);
         } else {
@@ -61,7 +61,7 @@ public class BulletinService {
         Optional<BoardEntity> boardOpt = boardRepository.findById(id);
         if (boardOpt.isPresent()) {
             BoardEntity board = boardOpt.get();
-            board.setBoardReadingCount(board.getBoardReadingCount() + 1);
+            board.setReadingCount(board.getReadingCount() + 1);
             boardRepository.save(board);
             return Optional.of("count added successfully " + board.getBoardId());
         } else {
@@ -86,9 +86,9 @@ public class BulletinService {
                  .orElseThrow(() -> new IllegalArgumentException("Invalid board ID: " + boardId));
          CommentEntity comment = CommentEntity.builder()
                 .board(board)
-                .commentWriter(writer)
-                .commentWritingTime(LocalDateTime.now())
-                .commentTextContent(textContent)
+                .writer(writer)
+                .writingTime(LocalDateTime.now())
+                .textContent(textContent)
                 .build();
         commentRepository.save(comment);
 

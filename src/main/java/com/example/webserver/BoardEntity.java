@@ -25,21 +25,21 @@ public class BoardEntity {
     private long boardId;
 
     @Column(name = "title", nullable = false)
-    private String boardTitle;
+    private String title;
 
     @Column(name = "writer", nullable = false)
-    private String boardWriter;
+    private String writer;
 
     @Column(name = "writing_time", nullable = false)
-    private LocalDateTime boardWritingDate;
+    private LocalDateTime writingDate;
 
     @Column(name = "reading_count", nullable = false)
-    private Integer boardReadingCount;
+    private Integer readingCount;
 
     @Column(name = "text_content", nullable = false)
-    private String boardTextContent;
+    private String textContent;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<CommentEntity> boardComments;
+    private List<CommentEntity> comments;
 }

@@ -69,6 +69,7 @@ public class BulletinService {
         }
     }
 
+
     public Optional<CommentEntity> findCommentById(long id) {
         CommentEntity comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("invalid comment id: " + id));
@@ -108,4 +109,32 @@ public class BulletinService {
         commentRepository.deleteById(commentId);
         return Optional.of(response);
     }
+
+    // find Comments by username
+    public Optional<List<CommentEntity>> getCommentsByWriter(String writer) {
+        return Optional.of(commentRepository.findByWriterNameJpql(writer));
+    }
+
+    // find Comments by not username
+    public Optional<List<CommentEntity>> getCommentsByWriterNot(String writer) {
+        return Optional.of(commentRepository.findByWriterNotJpql(writer));
+    }
+
+    // find Comment by date range
+    public Optional<List<CommentEntity>> getCommentsByCriteriaDate(LocalDateTime startDate, LocalDateTime endDate) {
+        return Optional.of(commentRepository.findCommentWithDateRange(startDate, endDate));
+    }
+
+    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountUnder(int pivot) {
+        return Optional.of(commentRepository.findByBoardReadingCountUnder(pivot));
+    }
+
+    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountMiddle(int underPivot, int upperPivot) {
+        return Optional.of(commentRepository.findByBoardReadingCountMiddle(underPivot, upperPivot));
+    }
+
+    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountUpper(int pivot) {
+        return Optional.of(commentRepository.findByBoardReadingCountUpper(pivot));
+    }
+
 }

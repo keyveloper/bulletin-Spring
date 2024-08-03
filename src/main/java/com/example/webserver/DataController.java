@@ -3,11 +3,13 @@ package com.example.webserver;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.stream.events.Comment;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,4 +76,41 @@ public class DataController {
                 .map(response -> ResponseEntity.accepted().body(response))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    // logics
+    @GetMapping("/comment")
+    public ResponseEntity<List<CommentEntity>> getCommentByWriter(
+            @RequestParam String writer,
+            @RequestParam(required = false) Boolean exception) {
+        if (exception) {
+            return bulletinService.getCommentsByWriterNot(writer)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        }
+        return bulletinService.getCommentsByWriter(writer)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/comment")
+    public ResponseEntity<List<CommentEntity>> getCommentByDateRAnge(
+            @RequestParam LocalDateTime startDate,
+            @RequestParam LocalDateTime endDate) {
+        return bulletinService.getCommentsByCriteriaDate(startDate, endDate)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
+    }
+
+    @GetMapping("/comment")
+    public ResponseEntity<List<CommentEntity>> getCommentByBoardReadingCriteria(
+            @RequestParam int underPivot,
+            @RequestParam int upperPivot,
+            @RequestParam boolean equal
+
+    ) {
+
+    }
+
+
 }

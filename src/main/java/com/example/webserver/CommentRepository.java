@@ -22,10 +22,17 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentEntity> findCommentWithDateRange(@Param("startDate")LocalDateTime startDate,
                                                  @Param("endDate") LocalDateTime endDate);
 
-    // board reading count : search comment
-    @Query(value = "SELECT c FROM CommentEntity c WHERE c.board.readingCount < 100 " +
-            "or 10000 < c.board.readingCount ")
-    List<CommentEntity> findByBoardReadingCount();
+    // board reading count : search under
+    @Query(value = "SELECT c FROM CommentEntity c WHERE c.board.readingCount < :pivot")
+    List<CommentEntity> findByBoardReadingCountUnder(@Param("pivot") int underPivot);
+
+    // board reading count : search equal and middle
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.readingCount BETWEEN :underPivot AND :upperPivot")
+    List<CommentEntity> findByBoardReadingCountMiddle(@Param("underPivot") int underPivot,
+                                                     @Param("upperPicot") int upperPivot);
+    // board reading count : search upper
+    @Query("SELECT c FROM CommentEntity c WHERE C.board.readingCount > :pivot")
+    List<CommentEntity> findByBoardReadingCountUpper(@Param("pivot") int upperPivot);
 
     List<CommentEntity> findByBoardBoardId(long bardId);
 }

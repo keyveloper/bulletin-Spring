@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -76,8 +77,8 @@ public class BulletinService {
         return Optional.of(comment);
     }
 
-    public Optional<List<CommentEntity>> findAllComment(long boardId) {
-        List<CommentEntity> comments = commentRepository.findByBoardBoardId(boardId);
+    public Optional<List<CommentEntity>> findAllComments(long boardId) {
+        List<CommentEntity> comments = commentRepository.findAllCommentsByBoardID(boardId);
         return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
     }
 
@@ -125,16 +126,50 @@ public class BulletinService {
         return Optional.of(commentRepository.findCommentWithDateRange(startDate, endDate));
     }
 
-    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountUnder(int pivot) {
-        return Optional.of(commentRepository.findByBoardReadingCountUnder(pivot));
+    // find reading Count average]
+    // <
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountLessThan(Integer pivot) {
+        return Optional.of(commentRepository.findCommentsWithBoardReadingCountLessThan(pivot));
     }
 
-    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountMiddle(int underPivot, int upperPivot) {
-        return Optional.of(commentRepository.findByBoardReadingCountMiddle(underPivot, upperPivot));
+    // < =
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountLessThanEqual(Integer pivot) {
+        return Optional.of(commentRepository.findCommentsWithBoardReadingCountLessThanEqual(pivot));
     }
 
-    public Optional<List<CommentEntity>> getCommentsByBoardReadingCountUpper(int pivot) {
-        return Optional.of(commentRepository.findByBoardReadingCountUpper(pivot));
+    // >
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountGreaterThan(Integer pivot) {
+        return Optional.of(commentRepository.findCommentsWithBoardReadingCountGreaterThan(pivot));
     }
 
+    // >=
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountGreaterThanEqual(Integer pivot) {
+        return Optional.of(commentRepository.findCommentsWithBoardReadingCountGreaterThanEqual(pivot));
+    }
+    // < <
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetween(
+            Integer underPivot, Integer upperPivot) {
+        return Optional.of(commentRepository.findCommentsWithBoardReadingCountBetween(underPivot, upperPivot));
+    }
+
+    // <= <
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetweenUnderEqual(
+            Integer underPivot, Integer upperPivot) {
+        return Optional.of(commentRepository.
+                findCommentsWithBoardReadingCountBetweenUnderEqual(underPivot, upperPivot));
+    }
+
+    // < <=
+    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetweenUpperEqual(
+            Integer underPivot, Integer upperPivot) {
+        return Optional.of(commentRepository
+                .findCommentsWithBoardReadingCountBetweenUpperEqual(underPivot, upperPivot));
+    }
+
+    // <= <=
+    public Optional<List<CommentEntity>> getCommentWithBoardReadingCountBetweenBothEqual(
+            Integer underPivot, Integer upperPivot) {
+        return Optional.of(commentRepository
+                .findCommentsWithBoardReadingCountBetweenBothEqual(underPivot, upperPivot));
+    }
 }

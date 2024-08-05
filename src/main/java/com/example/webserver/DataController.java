@@ -18,6 +18,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DataController {
     private final BulletinService bulletinService;
+    private final CommentService commentService;
 
     @GetMapping("/boardAll")
     public ResponseEntity<List<BoardEntity>> getAllBoardEntity() {
@@ -56,7 +57,7 @@ public class DataController {
 
     @GetMapping("/commentAll/{boardId}")
     public ResponseEntity<List<CommentEntity>> findAllComment(@PathVariable Long boardId) {
-        return bulletinService.findAllComment(boardId)
+        return bulletinService.findAllComments(boardId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -104,13 +105,15 @@ public class DataController {
 
     @GetMapping("/comment")
     public ResponseEntity<List<CommentEntity>> getCommentByBoardReadingCriteria(
-            @RequestParam int underPivot,
-            @RequestParam int upperPivot,
-            @RequestParam boolean equal
-
+            @RequestParam(required = false) int underPivot,
+            @RequestParam(required = false) int upperPivot,
+            @RequestParam(defaultValue = "false") boolean underEqual,
+            @RequestParam(defaultValue = "false") boolean upperEqual,
+            @RequestParam(defaultValue = "false") Boolean between
     ) {
-
+        Optional<List<CommentEntity>> comments = commentService.getCommentsByCriteria(
+                underPivot, upperPivot, underEqual, upperEqual, between);
+            return comments.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-
 }

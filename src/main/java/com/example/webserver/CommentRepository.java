@@ -5,11 +5,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.boardId = :boardId")
+    List<CommentEntity> findAllCommentsByBoardID(@Param("boardId") Long boardId);
+
     // find by username
     @Query(value = "SELECT c From CommentEntity c Where c.writer = :writer")
     List<CommentEntity> findByWriterNameJpql(@Param("writer") String writer);
@@ -24,15 +28,33 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     // board reading count : search under
     @Query(value = "SELECT c FROM CommentEntity c WHERE c.board.readingCount < :pivot")
-    List<CommentEntity> findByBoardReadingCountUnder(@Param("pivot") int underPivot);
+    List<CommentEntity> findCommentsWithBoardReadingCountLessThan(@Param("pivot") Integer pivot);
 
-    // board reading count : search equal and middle
-    @Query("SELECT c FROM CommentEntity c WHERE c.board.readingCount BETWEEN :underPivot AND :upperPivot")
-    List<CommentEntity> findByBoardReadingCountMiddle(@Param("underPivot") int underPivot,
-                                                     @Param("upperPicot") int upperPivot);
-    // board reading count : search upper
-    @Query("SELECT c FROM CommentEntity c WHERE C.board.readingCount > :pivot")
-    List<CommentEntity> findByBoardReadingCountUpper(@Param("pivot") int upperPivot);
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.readingCount > :pivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountGreaterThan(@Param("pivot") Integer pivot);
 
-    List<CommentEntity> findByBoardBoardId(long bardId);
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.readingCount <= :pivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountLessThanEqual(@Param("pivot") Integer pivot);
+
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.readingCount >= :pivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountGreaterThanEqual(@Param("pivot") Integer pivot);
+
+    @Query("SELECT c FROM CommentEntity c WHERE :underPivot < c.board.readingCount " +
+            "and c.board.readingCount < :upperPivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountBetween(@Param("underPivot") Integer underPivot,
+                                                                @Param("upperPivot") Integer upperPivot);
+
+    @Query("SELECT c FROM CommentEntity c WHERE :underPivot <= c.board.readingCount " +
+            "and c.board.readingCount < :upperPivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountBetweenUnderEqual(@Param("underPivot") Integer underPivot,
+                                                                     @Param("upperPivot") Integer upperPivot);
+    @Query("SELECT c FROM CommentEntity c WHERE :underPivot < c.board.readingCount " +
+            "and c.board.readingCount <= :upeerPivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountBetweenUpperEqual(@Param("underPivot") Integer underPivot,
+                                                                          @Param("upperPivot") Integer upperPivot);
+
+    @Query("SELECT c FROM CommentEntity c WHERE :underPivot <= c.board.readingCount " +
+            "and c.board.readingCount <= :upperPivot")
+    List<CommentEntity> findCommentsWithBoardReadingCountBetweenBothEqual(@Param("underPivot") Integer underPivot,
+                                                                          @Param("upperPivot") Integer upperPivot);
 }

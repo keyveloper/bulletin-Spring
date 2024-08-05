@@ -24,22 +24,7 @@ public class CommentService {
         return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
     }
 
-    @Transactional
-    public Optional<CommentResponse> putComment(long boardId, String writer, String textContent) {
-        BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid board ID: " + boardId));
-        CommentEntity comment = CommentEntity.builder()
-                .board(board)
-                .writer(writer)
-                .writingTime(LocalDateTime.now())
-                .textContent(textContent)
-                .build();
-        commentRepository.save(comment);
 
-        CommentResponse response = CommentResponse.builder()
-                .commentEntity(comment).message("comment added successfully").build();
-        return Optional.of(response);
-    }
 
     @Transactional
     public Optional<CommentResponse> deleteComment(long commentId) {

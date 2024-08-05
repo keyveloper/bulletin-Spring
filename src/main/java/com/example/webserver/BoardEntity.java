@@ -30,7 +30,7 @@ public class BoardEntity {
     @Column(name = "writer", nullable = false)
     private String writer;
 
-    @Column(name = "writing_time", nullable = false)
+    @Column(name = "writing_date", nullable = false)
     private LocalDateTime writingDate;
 
     @Column(name = "reading_count", nullable = false)

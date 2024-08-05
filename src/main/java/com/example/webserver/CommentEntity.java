@@ -31,8 +31,8 @@ public class CommentEntity {
     @Column(name="writer")
     private String writer;
 
-    @Column(name="writing_time")
-    private LocalDateTime writingTime;
+    @Column(name="writing_date")
+    private LocalDateTime writingDate;
 
     @Column(name="text_content")
     private String textContent;

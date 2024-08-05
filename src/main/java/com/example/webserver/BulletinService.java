@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -71,105 +70,4 @@ public class BulletinService {
     }
 
 
-    public Optional<CommentEntity> findCommentById(long id) {
-        CommentEntity comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("invalid comment id: " + id));
-        return Optional.of(comment);
-    }
-
-    public Optional<List<CommentEntity>> findAllComments(long boardId) {
-        List<CommentEntity> comments = commentRepository.findAllCommentsByBoardID(boardId);
-        return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
-    }
-
-    @Transactional
-    public Optional<CommentResponse> putComment(long boardId, String writer, String textContent) {
-         BoardEntity board = boardRepository.findById(boardId)
-                 .orElseThrow(() -> new IllegalArgumentException("Invalid board ID: " + boardId));
-         CommentEntity comment = CommentEntity.builder()
-                .board(board)
-                .writer(writer)
-                .writingTime(LocalDateTime.now())
-                .textContent(textContent)
-                .build();
-        commentRepository.save(comment);
-
-        CommentResponse response = CommentResponse.builder()
-                .commentEntity(comment).message("comment added successfully").build();
-        return Optional.of(response);
-    }
-
-    @Transactional
-    public Optional<CommentResponse> deleteComment(long commentId) {
-        CommentEntity comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));
-        CommentResponse response = CommentResponse.builder()
-                .commentEntity(comment)
-                .message("comment deleted successfully")
-                .build();
-        commentRepository.deleteById(commentId);
-        return Optional.of(response);
-    }
-
-    // find Comments by username
-    public Optional<List<CommentEntity>> getCommentsByWriter(String writer) {
-        return Optional.of(commentRepository.findByWriterNameJpql(writer));
-    }
-
-    // find Comments by not username
-    public Optional<List<CommentEntity>> getCommentsByWriterNot(String writer) {
-        return Optional.of(commentRepository.findByWriterNotJpql(writer));
-    }
-
-    // find Comment by date range
-    public Optional<List<CommentEntity>> getCommentsByCriteriaDate(LocalDateTime startDate, LocalDateTime endDate) {
-        return Optional.of(commentRepository.findCommentWithDateRange(startDate, endDate));
-    }
-
-    // find reading Count average]
-    // <
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountLessThan(Integer pivot) {
-        return Optional.of(commentRepository.findCommentsWithBoardReadingCountLessThan(pivot));
-    }
-
-    // < =
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountLessThanEqual(Integer pivot) {
-        return Optional.of(commentRepository.findCommentsWithBoardReadingCountLessThanEqual(pivot));
-    }
-
-    // >
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountGreaterThan(Integer pivot) {
-        return Optional.of(commentRepository.findCommentsWithBoardReadingCountGreaterThan(pivot));
-    }
-
-    // >=
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountGreaterThanEqual(Integer pivot) {
-        return Optional.of(commentRepository.findCommentsWithBoardReadingCountGreaterThanEqual(pivot));
-    }
-    // < <
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetween(
-            Integer underPivot, Integer upperPivot) {
-        return Optional.of(commentRepository.findCommentsWithBoardReadingCountBetween(underPivot, upperPivot));
-    }
-
-    // <= <
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetweenUnderEqual(
-            Integer underPivot, Integer upperPivot) {
-        return Optional.of(commentRepository.
-                findCommentsWithBoardReadingCountBetweenUnderEqual(underPivot, upperPivot));
-    }
-
-    // < <=
-    public Optional<List<CommentEntity>> getCommentsWithBoardReadingCountBetweenUpperEqual(
-            Integer underPivot, Integer upperPivot) {
-        return Optional.of(commentRepository
-                .findCommentsWithBoardReadingCountBetweenUpperEqual(underPivot, upperPivot));
-    }
-
-    // <= <=
-    public Optional<List<CommentEntity>> getCommentWithBoardReadingCountBetweenBothEqual(
-            Integer underPivot, Integer upperPivot) {
-        return Optional.of(commentRepository
-                .findCommentsWithBoardReadingCountBetweenBothEqual(underPivot, upperPivot));
-    }
 }

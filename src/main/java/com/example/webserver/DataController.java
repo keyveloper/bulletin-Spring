@@ -3,11 +3,9 @@ package com.example.webserver;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.stream.events.Comment;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,21 +77,23 @@ public class DataController {
     }
 
     // logics
-    @GetMapping("/comment")
+    @GetMapping("/comments/by-board-writer")
     public ResponseEntity<List<CommentEntity>> getCommentByWriter(
             @RequestParam String writer,
-            @RequestParam(required = false) Boolean exception) {
+            @RequestParam(required = false, defaultValue = "false") Boolean exception) {
         if (exception) {
             return bulletinService.getCommentsByWriterNot(writer)
                     .map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.notFound().build());
         }
+        log.info("writer -> {}", writer);
+        log.info("exception -> {]", exception);
         return bulletinService.getCommentsByWriter(writer)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/comment")
+    @GetMapping("/comments/by-board-writing-date-range")
     public ResponseEntity<List<CommentEntity>> getCommentByDateRAnge(
             @RequestParam LocalDateTime startDate,
             @RequestParam LocalDateTime endDate) {
@@ -103,7 +103,7 @@ public class DataController {
 
     }
 
-    @GetMapping("/comment")
+    @GetMapping("/comments/by-board-reading-criteria")
     public ResponseEntity<List<CommentEntity>> getCommentByBoardReadingCriteria(
             @RequestParam(required = false) int underPivot,
             @RequestParam(required = false) int upperPivot,

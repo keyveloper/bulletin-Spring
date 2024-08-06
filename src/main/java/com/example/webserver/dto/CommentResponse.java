@@ -1,5 +1,6 @@
-package com.example.webserver;
+package com.example.webserver.dto;
 
+import com.example.webserver.entity.CommentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

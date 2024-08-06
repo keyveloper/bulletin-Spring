@@ -1,5 +1,12 @@
-package com.example.webserver;
+package com.example.webserver.controller;
 
+import com.example.webserver.dto.RequestBoard;
+import com.example.webserver.dto.RequestComment;
+import com.example.webserver.dto.CommentResponse;
+import com.example.webserver.entity.BoardEntity;
+import com.example.webserver.entity.CommentEntity;
+import com.example.webserver.service.BulletinService;
+import com.example.webserver.service.CommentService;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;

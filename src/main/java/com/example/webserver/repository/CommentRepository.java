@@ -1,5 +1,6 @@
-package com.example.webserver;
+package com.example.webserver.repository;
 
+import com.example.webserver.entity.CommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

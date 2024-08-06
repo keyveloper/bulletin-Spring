@@ -1,5 +1,7 @@
 package com.example.webserver.service;
 
+import com.example.webserver.dto.CustomCriteriaRequestDto;
+import com.example.webserver.dto.GetCommentResultDto;
 import com.example.webserver.entity.BoardEntity;
 import com.example.webserver.entity.CommentEntity;
 import com.example.webserver.repository.CommentRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -116,5 +119,50 @@ public class CommentService {
             }
         }
         return Optional.empty();
+    }
+
+    public Optional<List<GetCommentResultDto>> getCommentByCustomCriteria(CustomCriteriaRequestDto request) {
+        if (request.getEndDate() == null) {
+            request.setEndDate(LocalDateTime.now());
+        }
+
+        if (allCriteriaFieldsNotNull(request)) {
+            List<CommentEntity> comments = commentRepository
+                    .findCommentsByWriterSameAndNotWithDateRangeAndLessOrGreaterCounting(
+                            request.getWriter(),
+                            request.getWriterExcepted(),
+                            request.getStartDate(),
+                            request.getEndDate(),
+                            request.getGreatPivot(),
+                            request.getLessPivot()
+                    );
+
+            List<GetCommentResultDto> commentDtos = comments.stream()
+                    .map(this::convertToGetResultDto)
+                    .collect(Collectors.toList());
+            return Optional.of(commentDtos);
+        } else {
+
+            return Optional.empty();
+        }
+    }
+
+    private GetCommentResultDto convertToGetResultDto(CommentEntity comment) {
+        return GetCommentResultDto.builder()
+                .boardId(comment.getBoard().getId())
+                .commentId(comment.getId())
+                .writer(comment.getWriter())
+                .textContent(comment.getTextContent())
+                .writingTime(comment.getWritingTime())
+                .build();
+    }
+
+    private boolean allCriteriaFieldsNotNull(CustomCriteriaRequestDto request) {
+        return request.getWriter() != null &&
+                request.getWriterExcepted() != null &&
+                request.getStartDate() != null &&
+                request.getEndDate() != null &&
+                request.getLessPivot() != null &&
+                request.getGreatPivot() != null;
     }
 }

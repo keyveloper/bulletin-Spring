@@ -21,7 +21,7 @@ public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
-    private long commentId;
+    private long id;
 
     @ManyToOne
     @JoinColumn(name="board_id")
@@ -31,8 +31,8 @@ public class CommentEntity {
     @Column(name="writer")
     private String writer;
 
-    @Column(name="writing_date")
-    private LocalDateTime writingDate;
+    @Column(name="writing_time")
+    private LocalDateTime writingTime;
 
     @Column(name="text_content")
     private String textContent;

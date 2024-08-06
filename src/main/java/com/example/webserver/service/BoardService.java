@@ -1,8 +1,9 @@
 package com.example.webserver.service;
 
+import com.example.webserver.dto.PostBoardResultDto;
 import com.example.webserver.entity.BoardEntity;
+import com.example.webserver.enums.PostBoardStatus;
 import com.example.webserver.repository.BoardRepository;
-import com.example.webserver.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BulletinService {
-    private final CommentRepository commentRepository;
+public class BoardService {
     private final BoardRepository boardRepository;
 
     public Optional<List<BoardEntity>> getAllBoard() {
@@ -22,15 +22,31 @@ public class BulletinService {
         return boards.isEmpty() ? Optional.empty() : Optional.of(boards);
     }
 
-    public Optional<Long> putBoard(String title, String writer, String textContent) {
-        BoardEntity board = BoardEntity.builder()
-                .title(title).writer(writer)
-                .textContent(textContent)
-                .writingDate(LocalDateTime.now())
-                .readingCount(0)
+    public PostBoardResultDto putBoard(String title, String writer, String textContent) {
+        if (title != null && writer != null && textContent != null) {
+            BoardEntity board = BoardEntity.builder()
+                    .title(title).writer(writer)
+                    .textContent(textContent)
+                    .writingTime(LocalDateTime.now())
+                    .readingCount(0)
+                    .build();
+            try {
+                boardRepository.save(board);
+                return PostBoardResultDto.builder()
+                        .postBoardStatus(PostBoardStatus.Ok)
+                        .id(board.getId()).writer(board.getWriter())
+                        .writingTime(board.getWritingTime()).build();
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Failed to save board", e);
+            }
+        }
+
+        return PostBoardResultDto.builder()
+                .postBoardStatus(PostBoardStatus.Failed)
+                .id(-1)
+                .writer(null)
+                .writingTime(null)
                 .build();
-        boardRepository.save(board);
-        return Optional.of(board.getBoardId());
     }
 
     public Optional<BoardEntity> findBoard(long id) {
@@ -66,27 +82,9 @@ public class BulletinService {
             BoardEntity board = boardOpt.get();
             board.setReadingCount(board.getReadingCount() + 1);
             boardRepository.save(board);
-            return Optional.of("count added successfully " + board.getBoardId());
+            return Optional.of("count added successfully " + board.getId());
         } else {
             return Optional.empty();
         }
     }
-    @Transactional
-    public Optional<CommentResponse> putComment(long boardId, String writer, String textContent) {
-        BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid board ID: " + boardId));
-        CommentEntity comment = CommentEntity.builder()
-                .board(board)
-                .writer(writer)
-                .writingTime(LocalDateTime.now())
-                .textContent(textContent)
-                .build();
-        commentRepository.save(comment);
-
-        CommentResponse response = CommentResponse.builder()
-                .commentEntity(comment).message("comment added successfully").build();
-        return Optional.of(response);
-    }
-
-
 }

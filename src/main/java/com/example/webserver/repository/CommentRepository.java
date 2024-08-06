@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
-    @Query("SELECT c FROM CommentEntity c WHERE c.board.boardId = :boardId")
-    List<CommentEntity> findAllCommentsByBoardID(@Param("boardId") Long boardId);
+    @Query("SELECT c FROM CommentEntity c WHERE c.board.id = :boardId")
+    List<CommentEntity> findAllCommentsByBoardId(@Param("boardId") Long boardId);
 
     // find by /board-writer
     @Query(value = "SELECT c From CommentEntity c Where c.board.writer = :writer")
@@ -23,7 +23,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     // find by /board-writing-date
     //criteria: 3 <= date < 10 (pivot = today)
-    @Query(value = "SELECT c FROM CommentEntity c WHERE c.board.writingDate BETWEEN :startDate AND :endDate")
+    @Query(value = "SELECT c FROM CommentEntity c WHERE c.board.writingTime BETWEEN :startDate AND :endDate")
     List<CommentEntity> findCommentWithBoardDateRange(@Param("startDate")LocalDateTime startDate,
                                                       @Param("endDate") LocalDateTime endDate);
 
@@ -59,4 +59,5 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
             "and c.board.readingCount <= :upperPivot")
     List<CommentEntity> findCommentsWithBoardReadingCountBetweenBothEqual(@Param("underPivot") Integer underPivot,
                                                                           @Param("upperPivot") Integer upperPivot);
+
 }

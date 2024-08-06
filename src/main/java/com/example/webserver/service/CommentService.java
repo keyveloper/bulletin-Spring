@@ -1,11 +1,14 @@
 package com.example.webserver.service;
 
-import com.example.webserver.dto.CommentResponse;
 import com.example.webserver.entity.BoardEntity;
 import com.example.webserver.entity.CommentEntity;
 import com.example.webserver.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import com.example.webserver.dto.PostCommentResultDto;
+import com.example.webserver.repository.BoardRepository;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
+    private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
     public Optional<CommentEntity> findCommentById(long id) {
@@ -24,22 +28,49 @@ public class CommentService {
     }
 
     public Optional<List<CommentEntity>> findAllComments(long boardId) {
-        List<CommentEntity> comments = commentRepository.findAllCommentsByBoardID(boardId);
+        List<CommentEntity> comments = commentRepository.findAllCommentsByBoardId(boardId);
         return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
     }
 
 
+    @Transactional
+    public PostCommentResultDto putComment(long boardId, String writer, String textContent) {
+        try {
+            Optional<BoardEntity> board = boardRepository.findById(boardId);
+            if (board.isEmpty()) {
+                return PostCommentResultDto.builder()
+                        .boardId(-1)
+                        .commentId(-1)
+                        .writer(null)
+                        .writingTime(null)
+                        .build();
+            } else {
+                CommentEntity comment = CommentEntity.builder()
+                        .board(board.get())
+                        .writer(writer)
+                        .writingTime(LocalDateTime.now())
+                        .textContent(textContent)
+                        .build();
+                return PostCommentResultDto.builder()
+                        .boardId(board.get().getId())
+                        .commentId(comment.getId())
+                        .writer(comment.getWriter())
+                        .writingTime(comment.getWritingTime())
+                        .build();
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to save comment data", e);
+        }
+    }
 
     @Transactional
-    public Optional<CommentResponse> deleteComment(long commentId) {
-        CommentEntity comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));
-        CommentResponse response = CommentResponse.builder()
-                .commentEntity(comment)
-                .message("comment deleted successfully")
-                .build();
-        commentRepository.deleteById(commentId);
-        return Optional.of(response);
+    public String deleteComment(long commentId) {
+        try {
+            commentRepository.deleteById(commentId);
+            return "commentId: " + commentId + "was deleted";
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("Comment not found with id" + commentId, 1);
+        }
     }
 
     // find Comments by username

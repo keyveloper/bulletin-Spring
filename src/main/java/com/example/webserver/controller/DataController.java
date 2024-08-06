@@ -55,14 +55,14 @@ public class DataController {
 
     @GetMapping("/comment/{id}")
     public ResponseEntity<CommentEntity> findCommentById(@PathVariable Long id) {
-        return bulletinService.findCommentById(id)
+        return commentService.findCommentById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/commentAll/{boardId}")
     public ResponseEntity<List<CommentEntity>> findAllComment(@PathVariable Long boardId) {
-        return bulletinService.findAllComments(boardId)
+        return commentService.findAllComments(boardId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -78,7 +78,7 @@ public class DataController {
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<CommentResponse> deleteComment(@PathVariable Long id) {
-        return bulletinService.deleteComment(id)
+        return commentService.deleteComment(id)
                 .map(response -> ResponseEntity.accepted().body(response))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -89,13 +89,13 @@ public class DataController {
             @RequestParam String writer,
             @RequestParam(required = false, defaultValue = "false") Boolean exception) {
         if (exception) {
-            return bulletinService.getCommentsByWriterNot(writer)
+            return commentService.getCommentsByWriterNot(writer)
                     .map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.notFound().build());
         }
         log.info("writer -> {}", writer);
         log.info("exception -> {]", exception);
-        return bulletinService.getCommentsByWriter(writer)
+        return commentService.getCommentsByWriter(writer)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -104,7 +104,7 @@ public class DataController {
     public ResponseEntity<List<CommentEntity>> getCommentByDateRAnge(
             @RequestParam LocalDateTime startDate,
             @RequestParam LocalDateTime endDate) {
-        return bulletinService.getCommentsByCriteriaDate(startDate, endDate)
+        return commentService.getCommentsByCriteriaDate(startDate, endDate)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
 

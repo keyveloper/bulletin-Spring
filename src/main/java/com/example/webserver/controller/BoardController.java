@@ -6,7 +6,6 @@ import com.example.webserver.dto.PostBoardResultDto;
 import com.example.webserver.entity.BoardEntity;
 import com.example.webserver.enums.PostBoardStatus;
 import com.example.webserver.service.BoardService;
-import com.example.webserver.service.CommentService;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BoardController {
     private final BoardService boardService;
-    private final CommentService commentService;
 
     @GetMapping("/boardAll")
     public ResponseEntity<List<BoardEntity>> getAllBoardEntity() {

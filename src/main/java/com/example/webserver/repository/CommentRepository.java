@@ -61,9 +61,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
                                                                           @Param("upperPivot") Integer upperPivot);
 
     @Query("SELECT c FROM CommentEntity c "
-            + "WHERE c.board.writer = :writer and "
-            + "c.board.writer != :writerExcepted and "
-            + "c.board.writingTime BETWEEN :startDate and :EndDate and "
+            + "WHERE c.board.writer LIKE %:writer% and "
+            + "c.board.writer NOT LIKE %:writerExcepted% and "
+            + "c.board.writingTime BETWEEN :startDate and :endDate and "
             + "c.board.readingCount > :greaterPivot or "
             + "c.board.readingCount < :lessPivot")
     List<CommentEntity> findCommentsByWriterSameAndNotWithDateRangeAndLessOrGreaterCounting(

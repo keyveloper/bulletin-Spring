@@ -6,12 +6,14 @@ import com.example.webserver.enums.PostBoardStatus;
 import com.example.webserver.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -23,6 +25,7 @@ public class BoardService {
     }
 
     public PostBoardResultDto putBoard(String title, String writer, String textContent) {
+        log.info("title -> {}, writer -> {}, text -> {}", title, writer, textContent);
         if (title != null && writer != null && textContent != null) {
             BoardEntity board = BoardEntity.builder()
                     .title(title).writer(writer)
@@ -39,14 +42,14 @@ public class BoardService {
             } catch (RuntimeException e) {
                 throw new RuntimeException("Failed to save board", e);
             }
+        } else {
+            return PostBoardResultDto.builder()
+                    .postBoardStatus(PostBoardStatus.Failed)
+                    .id(-1)
+                    .writer(null)
+                    .writingTime(null)
+                    .build();
         }
-
-        return PostBoardResultDto.builder()
-                .postBoardStatus(PostBoardStatus.Failed)
-                .id(-1)
-                .writer(null)
-                .writingTime(null)
-                .build();
     }
 
     public Optional<BoardEntity> findBoard(long id) {

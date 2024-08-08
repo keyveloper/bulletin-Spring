@@ -35,9 +35,10 @@ public class CommentController {
 
     @PostMapping("/comment")
     public ResponseEntity<PostCommentResponseDto> postComment(@RequestBody PostCommentRequestDto request) {
-        log.info("request: {}", request);
+        log.info("request -> {}", request.toString());
         PostCommentResultDto commentResultDto = commentService.putComment(
                 request.getBoardId(), request.getWriter(), request.getTextContent());
+        log.info("commentResultDto -> {}", commentResultDto.toString());
         // status별로 Response 구분
         if (commentResultDto.getPostCommentStatus() == PostCommentStatus.Ok) {
             return ResponseEntity.ok().body(
@@ -76,8 +77,8 @@ public class CommentController {
             @RequestParam String writerExcepted,
             @RequestParam LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
-            @RequestParam Integer lessPivot,
-            @RequestParam Integer greaterPivot) {
+            @RequestParam Integer lessThan,
+            @RequestParam Integer greaterThan) {
         Optional<List<GetCommentResultDto>> comments =
                 commentService.getCommentByCustomCriteria(
                 CustomCriteriaRequestDto.builder()
@@ -85,9 +86,10 @@ public class CommentController {
                         .writerExcepted(writerExcepted)
                         .startDate(startDate)
                         .endDate(endDate)
-                        .lessPivot(lessPivot)
-                        .greatPivot(greaterPivot)
+                        .lessThan(lessThan)
+                        .greatThan(greaterThan)
                         .build());
+
         return comments.map(getCommentResultDtos ->
                         ResponseEntity.ok().body(getCommentResultDtos))
                 .orElseGet(() -> ResponseEntity.notFound().build());

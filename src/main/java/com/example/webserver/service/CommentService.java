@@ -4,11 +4,13 @@ import com.example.webserver.dto.CustomCriteriaRequestDto;
 import com.example.webserver.dto.GetCommentResultDto;
 import com.example.webserver.entity.BoardEntity;
 import com.example.webserver.entity.CommentEntity;
+import com.example.webserver.enums.PostCommentStatus;
 import com.example.webserver.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.example.webserver.dto.PostCommentResultDto;
 import com.example.webserver.repository.BoardRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -39,8 +42,10 @@ public class CommentService {
     @Transactional
     public PostCommentResultDto putComment(long boardId, String writer, String textContent) {
         try {
+            log.info("boardId -> {}, writer -> {}, text content -> {}", boardId, writer, textContent);
             Optional<BoardEntity> board = boardRepository.findById(boardId);
             if (board.isEmpty()) {
+                log.info("board is empty");
                 return PostCommentResultDto.builder()
                         .boardId(-1)
                         .commentId(-1)
@@ -54,7 +59,9 @@ public class CommentService {
                         .writingTime(LocalDateTime.now())
                         .textContent(textContent)
                         .build();
+                commentRepository.save(comment);
                 return PostCommentResultDto.builder()
+                        .postCommentStatus(PostCommentStatus.Ok)
                         .boardId(board.get().getId())
                         .commentId(comment.getId())
                         .writer(comment.getWriter())
@@ -122,19 +129,20 @@ public class CommentService {
     }
 
     public Optional<List<GetCommentResultDto>> getCommentByCustomCriteria(CustomCriteriaRequestDto request) {
+        log.info("request -> {}", request.toString());
         if (request.getEndDate() == null) {
             request.setEndDate(LocalDateTime.now());
         }
 
         if (allCriteriaFieldsNotNull(request)) {
             List<CommentEntity> comments = commentRepository
-                    .findCommentsByWriterSameAndNotWithDateRangeAndLessOrGreaterCounting(
+                    .findCommentsByCustomCriteria(
                             request.getWriter(),
                             request.getWriterExcepted(),
                             request.getStartDate(),
                             request.getEndDate(),
-                            request.getGreatPivot(),
-                            request.getLessPivot()
+                            request.getGreatThan(),
+                            request.getLessThan()
                     );
 
             List<GetCommentResultDto> commentDtos = comments.stream()
@@ -162,7 +170,7 @@ public class CommentService {
                 request.getWriterExcepted() != null &&
                 request.getStartDate() != null &&
                 request.getEndDate() != null &&
-                request.getLessPivot() != null &&
-                request.getGreatPivot() != null;
+                request.getLessThan() != null &&
+                request.getGreatThan() != null;
     }
 }

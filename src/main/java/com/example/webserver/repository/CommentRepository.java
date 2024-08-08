@@ -64,13 +64,13 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
             + "WHERE c.board.writer LIKE %:writer% and "
             + "c.board.writer NOT LIKE %:writerExcepted% and "
             + "c.board.writingTime BETWEEN :startDate and :endDate and "
-            + "c.board.readingCount > :greaterPivot or "
-            + "c.board.readingCount < :lessPivot")
-    List<CommentEntity> findCommentsByWriterSameAndNotWithDateRangeAndLessOrGreaterCounting(
+            + "(c.board.readingCount > :greaterThan or "
+            + "c.board.readingCount < :lessThan)")
+    List<CommentEntity> findCommentsByCustomCriteria(
             @Param("writer") String writer,
             @Param("writerExcepted") String writerExcepted,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
-            @Param("greaterPivot") Integer greaterPivot,
-            @Param("lessPivot") Integer lessPivot);
+            @Param("greaterThan") Integer greaterThan,
+            @Param("lessThan") Integer lessThan);
 }
